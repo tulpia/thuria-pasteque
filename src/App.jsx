@@ -20,7 +20,6 @@ function App() {
 
   const handleAddCircle = (e) => {
     const mousePos = getMousePos(canvasRef.current, e);
-
     const ball = Matter.Bodies.circle(mousePos.x, 0, nextCircle.radius, {
       restitution: nextCircle.restitution,
 
@@ -28,8 +27,6 @@ function App() {
         fillStyle: nextCircle.fill,
       },
     });
-
-    console.log(ball);
 
     Matter.World.add(engine.world, [ball]);
 
@@ -114,8 +111,8 @@ function App() {
       <div
         ref={boxRef}
         style={{
-          width: 300,
-          height: 600,
+          width: config.width,
+          height: config.height,
         }}
         onClick={handleAddCircle}
       >
