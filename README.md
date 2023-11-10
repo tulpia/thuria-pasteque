@@ -1,8 +1,6 @@
-# React + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## TODO :
+- Collision entre cercles / cercles pareils doivent se manger (le cercle le plus haut fusionne avec celui le plus bas
+- RNG avec des odds pour que certains cercles aient plus / moins de chances de spawn que d'autres
+- Textures pessi thuria en PNG
+- Pasteque finale
+- Points pour chaque cercle
