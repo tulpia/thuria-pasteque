@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import Matter from "matter-js";
 import { useEffect, useState, useRef } from "react";
 import "./App.css";
@@ -7,6 +8,14 @@ import NextCircle from "./components/NextCircle";
 
 // Utils
 import circles from "./utils/circles";
+
+// Ressources
+import yellow from './assets/yellow.png';
+import green from './assets/green.png';
+import blue from './assets/blue.png';
+import red from './assets/red.png';
+import black from './assets/black.png';
+import orange from './assets/orange.png';
 
 function App() {
   const config = {
@@ -24,7 +33,9 @@ function App() {
       restitution: nextCircle.restitution,
 
       render: {
-        fillStyle: nextCircle.fill,
+        sprite: {
+          texture: eval(nextCircle.fill)
+        }
       },
     });
 
