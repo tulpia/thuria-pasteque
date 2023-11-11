@@ -2,14 +2,6 @@ import Matter from "matter-js";
 import { MatterCollisionEvents } from "matter-collision-events";
 import circles from "../utils/circles";
 
-// Ressources
-import yellow from "./../assets/yellow.png";
-import green from "./../assets/green.png";
-import blue from "./../assets/blue.png";
-import red from "./../assets/red.png";
-import black from "./../assets/black.png";
-import orange from "./../assets/orange.png";
-
 Matter.use(MatterCollisionEvents);
 
 class SuikaEngine {
@@ -90,23 +82,26 @@ class SuikaEngine {
   }
 
   createCircle(x, y, selectedCircle, isCreation = false) {
-    const ball = Matter.Bodies.circle(x, y, selectedCircle.radius, {
+    this.lastCreatedCircle = Matter.Bodies.circle(x, y, selectedCircle.radius, {
       restitution: selectedCircle.restitution,
 
       render: {
         sprite: {
-          texture: eval(selectedCircle.fill),
+          texture: selectedCircle.image,
         },
       },
     });
 
-    Matter.World.add(this.engine.world, [ball]);
+    Matter.World.add(this.engine.world, [this.lastCreatedCircle]);
 
     // On figure out quel est l'élément àjouter après que cet élément soit fusionné
     let circleIndex = null;
 
     circles.forEach((circle, index) => {
-      if (circleIndex === null && circle.radius === ball.circleRadius) {
+      if (
+        circleIndex === null &&
+        circle.radius === this.lastCreatedCircle.circleRadius
+      ) {
         circleIndex = index + 1;
 
         if (circleIndex > circles.length - 1) {
@@ -117,29 +112,30 @@ class SuikaEngine {
 
     // Ajout de l'event sur l'objet
     if (circleIndex !== null) {
-      ball.onCollide((pair) => {
+      this.lastCreatedCircle.onCollide((pair) => {
         if (pair.bodyA.id !== this.floor.id) {
           let ballCollided = null;
 
-          if (pair.bodyA.id !== ball.id) {
+          if (pair.bodyA.id !== this.lastCreatedCircle.id) {
             ballCollided = pair.bodyA;
           }
 
-          if (pair.bodyB.id !== ball.id) {
+          if (pair.bodyB.id !== this.lastCreatedCircle.id) {
             ballCollided = pair.bodyB;
           }
 
           if (ballCollided) {
             if (
-              ballCollided.circleRadius === ball.circleRadius &&
-              ballCollided.position.y > ball.position.y
+              ballCollided.circleRadius ===
+                this.lastCreatedCircle.circleRadius &&
+              ballCollided.position.y > this.lastCreatedCircle.position.y
             ) {
-              Matter.World.remove(this.engine.world, ball);
+              Matter.World.remove(this.engine.world, this.lastCreatedCircle);
               Matter.World.remove(this.engine.world, ballCollided);
 
               this.createCircle(
-                ball.position.x,
-                ball.position.y,
+                this.lastCreatedCircle.position.x,
+                this.lastCreatedCircle.position.y,
                 circles[circleIndex],
                 false
               );
@@ -158,12 +154,27 @@ class SuikaEngine {
     }
   }
 
-  getEngine() {
+  // La magie des setters/getters
+  get engine() {
     return this.engine;
   }
 
-  getNextCircle() {
+  get nextCircle() {
     return this.nextCircle;
+  }
+
+  get lastCreatedCircle() {
+    return this._lastCreatedCircle;
+  }
+
+  set lastCreatedCircle(lastCreatedCircle) {
+    this._lastCreatedCircle = lastCreatedCircle;
+
+    this.onLastCreatedCircle(this.lastCreatedCircle);
+  }
+
+  onLastCreatedCircle(lastCreatedCircle) {
+    console.warn("you need to override this function");
   }
 }
 
