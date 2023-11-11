@@ -5,9 +5,7 @@ import { Typography } from "@mui/material";
 // Utils
 import circles from "../../../utils/circles";
 
-const Points = ({ lastCircle }) => {
-  const [points, setPoints] = useState(0);
-
+const Points = ({ lastCircle, points, setPoints }) => {
   useEffect(() => {
     if (lastCircle) {
       circles.forEach((circle) => {

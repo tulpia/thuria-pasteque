@@ -3,7 +3,7 @@ import "./App.css";
 
 // Libraries
 import { useEffect, useState, useRef } from "react";
-import { Container, Grid } from "@mui/material";
+import { Container, Grid, Typography } from "@mui/material";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
@@ -20,6 +20,8 @@ import SuikaEngine from "./classes/SuikaEngine";
 function App() {
   const [nextCircle, setNextCircle] = useState(circles[0]);
   const [lastCircle, setLastCircle] = useState(null);
+  const [hasLost, setHasLost] = useState(false);
+  const [points, setPoints] = useState(0);
 
   let suikaEngine = useRef(null);
   const boxRef = useRef(null);
@@ -57,6 +59,10 @@ function App() {
       suikaEngine.current.onLastCreatedCircle = (lastCreatedCircle) => {
         setLastCircle(lastCreatedCircle);
       };
+
+      suikaEngine.current.onLose = () => {
+        setHasLost(true);
+      };
     }
   }, [boxRef, canvasRef, suikaEngine]);
 
@@ -70,16 +76,33 @@ function App() {
             marginRight: 40,
           }}
         >
-          <Header lastCircle={lastCircle} nextCircle={nextCircle} />
+          <Header
+            lastCircle={lastCircle}
+            nextCircle={nextCircle}
+            points={points}
+            setPoints={setPoints}
+          />
 
           <div
             ref={boxRef}
             style={{
               width: config.width,
               height: config.height,
+              pointerEvents: hasLost ? "none" : "auto",
+              position: "relative",
             }}
             onClick={handleAddCircle}
           >
+            {hasLost && (
+              <div className="lost">
+                <Typography color={"white"} fontSize={28} textAlign={"center"}>
+                  YOU LOST
+                </Typography>
+                <Typography color={"white"} fontSize={14} textAlign={"center"}>
+                  Points : <strong>{points}</strong>
+                </Typography>
+              </div>
+            )}
             <canvas ref={canvasRef} />
           </div>
         </Grid>

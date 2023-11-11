@@ -10,17 +10,23 @@ class SuikaEngine {
   floor;
   wallRight;
   wallLeft;
+  ceiling;
   nextCircle;
+  lockLose;
+  lockLoseTimeout;
+  lose = false;
 
   constructor(box, canvas, config) {
     this.config = config;
     this.init(box, canvas);
     this.createBox();
+    this.initLose();
 
     Matter.World.add(this.engine.world, [
       this.floor,
       this.wallLeft,
       this.wallRight,
+      this.ceiling,
     ]);
     Matter.Runner.run(this.engine);
     Matter.Render.run(this.render);
@@ -67,6 +73,7 @@ class SuikaEngine {
         },
       }
     );
+
     this.wallRight = Matter.Bodies.rectangle(
       this.config.width,
       this.config.height / 2,
@@ -79,10 +86,31 @@ class SuikaEngine {
         },
       }
     );
+
+    this.ceiling = Matter.Bodies.rectangle(
+      this.config.width / 2,
+      0,
+      this.config.width,
+      2,
+      {
+        isStatic: true,
+        render: {
+          fillStyle: "transparent",
+        },
+      }
+    );
   }
 
   createCircle(x, y, selectedCircle, isCreation = false) {
-    this.lastCreatedCircle = Matter.Bodies.circle(x, y, selectedCircle.radius, {
+    if (isCreation) {
+      this.lockLose = true;
+
+      this.lockLoseTimeout = setTimeout(() => {
+        this.lockLose = false;
+      }, 100);
+    }
+
+    const ball = Matter.Bodies.circle(x, y, selectedCircle.radius, {
       restitution: selectedCircle.restitution,
 
       render: {
@@ -92,16 +120,15 @@ class SuikaEngine {
       },
     });
 
-    Matter.World.add(this.engine.world, [this.lastCreatedCircle]);
+    this.lastCreatedCircle = ball;
+
+    Matter.World.add(this.engine.world, [ball]);
 
     // On figure out quel est l'élément àjouter après que cet élément soit fusionné
     let circleIndex = null;
 
     circles.forEach((circle, index) => {
-      if (
-        circleIndex === null &&
-        circle.radius === this.lastCreatedCircle.circleRadius
-      ) {
+      if (circleIndex === null && circle.radius === ball.circleRadius) {
         circleIndex = index + 1;
 
         if (circleIndex > circles.length - 1) {
@@ -112,30 +139,29 @@ class SuikaEngine {
 
     // Ajout de l'event sur l'objet
     if (circleIndex !== null) {
-      this.lastCreatedCircle.onCollide((pair) => {
+      ball.onCollide((pair) => {
         if (pair.bodyA.id !== this.floor.id) {
           let ballCollided = null;
 
-          if (pair.bodyA.id !== this.lastCreatedCircle.id) {
+          if (pair.bodyA.id !== ball.id) {
             ballCollided = pair.bodyA;
           }
 
-          if (pair.bodyB.id !== this.lastCreatedCircle.id) {
+          if (pair.bodyB.id !== ball.id) {
             ballCollided = pair.bodyB;
           }
 
           if (ballCollided) {
             if (
-              ballCollided.circleRadius ===
-                this.lastCreatedCircle.circleRadius &&
-              ballCollided.position.y > this.lastCreatedCircle.position.y
+              ballCollided.circleRadius === ball.circleRadius &&
+              ballCollided.position.y > ball.position.y
             ) {
-              Matter.World.remove(this.engine.world, this.lastCreatedCircle);
+              Matter.World.remove(this.engine.world, ball);
               Matter.World.remove(this.engine.world, ballCollided);
 
               this.createCircle(
-                this.lastCreatedCircle.position.x,
-                this.lastCreatedCircle.position.y,
+                ball.position.x,
+                ball.position.y,
                 circles[circleIndex],
                 false
               );
@@ -152,6 +178,16 @@ class SuikaEngine {
 
       this.nextCircle = circles[randomInteger];
     }
+  }
+
+  initLose() {
+    this.ceiling.onCollide(() => {
+      if (!this.lockLose && !this.lose) {
+        this.lose = true;
+
+        this.onLose();
+      }
+    });
   }
 
   // La magie des setters/getters
@@ -174,6 +210,10 @@ class SuikaEngine {
   }
 
   onLastCreatedCircle(lastCreatedCircle) {
+    console.warn("you need to override this function");
+  }
+
+  onLose() {
     console.warn("you need to override this function");
   }
 }
