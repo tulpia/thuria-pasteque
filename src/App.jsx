@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import "./App.css";
 
 // Components
-import NextCircle from "./components/NextCircle";
+import Header from "./components/Header";
 
 // Utils
 import circles from "./utils/circles";
@@ -11,6 +11,7 @@ import SuikaEngine from "./classes/SuikaEngine";
 
 function App() {
   const [nextCircle, setNextCircle] = useState(circles[0]);
+  const [lastCircle, setLastCircle] = useState(null);
 
   let suikaEngine = useRef(null);
   const boxRef = useRef(null);
@@ -34,23 +35,26 @@ function App() {
     const mousePos = getMousePos(canvasRef.current, e);
 
     suikaEngine.current.createCircle(mousePos.x, 0, nextCircle, true);
-    setNextCircle(suikaEngine.current.getNextCircle());
+    setNextCircle(suikaEngine.current.nextCircle);
   };
 
   useEffect(() => {
     if (boxRef.current && canvasRef.current && !suikaEngine.current) {
-      console.log("set");
       suikaEngine.current = new SuikaEngine(
         boxRef.current,
         canvasRef.current,
         config
       );
+
+      suikaEngine.current.onLastCreatedCircle = (lastCreatedCircle) => {
+        setLastCircle(lastCreatedCircle);
+      };
     }
   }, [boxRef, canvasRef, suikaEngine]);
 
   return (
-    <>
-      <NextCircle nextCircle={nextCircle} />
+    <main>
+      <Header lastCircle={lastCircle} nextCircle={nextCircle} />
 
       <div
         ref={boxRef}
@@ -62,7 +66,7 @@ function App() {
       >
         <canvas ref={canvasRef} />
       </div>
-    </>
+    </main>
   );
 }
 
