@@ -2,14 +2,6 @@ import Matter from "matter-js";
 import { MatterCollisionEvents } from "matter-collision-events";
 import circles from "../utils/circles";
 
-// Ressources
-import yellow from "./../assets/yellow.png";
-import green from "./../assets/green.png";
-import blue from "./../assets/blue.png";
-import red from "./../assets/red.png";
-import black from "./../assets/black.png";
-import orange from "./../assets/orange.png";
-
 Matter.use(MatterCollisionEvents);
 
 class SuikaEngine {
@@ -95,7 +87,7 @@ class SuikaEngine {
 
       render: {
         sprite: {
-          texture: eval(selectedCircle.fill),
+          texture: selectedCircle.image,
         },
       },
     });

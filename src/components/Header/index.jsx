@@ -1,5 +1,8 @@
 import "./styles.css";
 
+// Libraries
+import { Button } from "@mui/material";
+
 // Components
 import NextCircle from "./NextCircle";
 import Points from "./Points";
@@ -13,7 +16,7 @@ const Header = ({ lastCircle, nextCircle }) => {
     <header>
       <Points lastCircle={lastCircle} />
       <NextCircle nextCircle={nextCircle} />
-      <button onClick={reset}>Reset</button>
+      <Button onClick={reset}>Reset</Button>
     </header>
   );
 };

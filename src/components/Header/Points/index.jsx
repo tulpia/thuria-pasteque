@@ -1,4 +1,6 @@
+// Libraries
 import { useEffect, useState } from "react";
+import { Typography } from "@mui/material";
 
 // Utils
 import circles from "../../../utils/circles";
@@ -16,11 +18,7 @@ const Points = ({ lastCircle }) => {
     }
   }, [lastCircle]);
 
-  return (
-    <p>
-      <strong>{points}</strong>
-    </p>
-  );
+  return <Typography>{points}</Typography>;
 };
 
 export default Points;

@@ -1,9 +1,17 @@
 /* eslint-disable no-unused-vars */
-import { useEffect, useState, useRef } from "react";
 import "./App.css";
+
+// Libraries
+import { useEffect, useState, useRef } from "react";
+import { Container, Grid } from "@mui/material";
+import "@fontsource/roboto/300.css";
+import "@fontsource/roboto/400.css";
+import "@fontsource/roboto/500.css";
+import "@fontsource/roboto/700.css";
 
 // Components
 import Header from "./components/Header";
+import PointsResume from "./components/PointsResume";
 
 // Utils
 import circles from "./utils/circles";
@@ -53,20 +61,33 @@ function App() {
   }, [boxRef, canvasRef, suikaEngine]);
 
   return (
-    <main>
-      <Header lastCircle={lastCircle} nextCircle={nextCircle} />
+    <Container maxWidth={"100%"}>
+      <Grid container justifyContent={"center"} maxWidth={"100%"}>
+        <Grid
+          item
+          style={{
+            width: config.width,
+            marginRight: 40,
+          }}
+        >
+          <Header lastCircle={lastCircle} nextCircle={nextCircle} />
 
-      <div
-        ref={boxRef}
-        style={{
-          width: config.width,
-          height: config.height,
-        }}
-        onClick={handleAddCircle}
-      >
-        <canvas ref={canvasRef} />
-      </div>
-    </main>
+          <div
+            ref={boxRef}
+            style={{
+              width: config.width,
+              height: config.height,
+            }}
+            onClick={handleAddCircle}
+          >
+            <canvas ref={canvasRef} />
+          </div>
+        </Grid>
+        <Grid item xs={2}>
+          <PointsResume></PointsResume>
+        </Grid>
+      </Grid>
+    </Container>
   );
 }
 
