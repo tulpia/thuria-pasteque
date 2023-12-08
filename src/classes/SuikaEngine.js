@@ -174,7 +174,11 @@ class SuikaEngine {
     // Changement du prochain cercle
     if (isCreation) {
       const randomInteger =
-        Math.floor(Math.random() * (circles.length - 2 - 0 + 1)) + 0;
+        Math.floor(
+          Math.random() *
+            (circles.filter((circle) => circle.droppable).length - 1)
+        ) + 0;
+      console.log(randomInteger);
 
       this.nextCircle = circles[randomInteger];
     }

@@ -1,52 +1,68 @@
-import yellow from "./../assets/yellow.png";
-import green from "./../assets/green.png";
-import blue from "./../assets/blue.png";
-import red from "./../assets/red.png";
-import black from "./../assets/black.png";
-import orange from "./../assets/orange.png";
+import paetan from "./../assets/paetan.png";
+import poe from "./../assets/poe.png";
+import pophia from "./../assets/pophia.png";
+import po from "./../assets/po.png";
+import palexis from "./../assets/palexis.png";
+import palec from "./../assets/palec.png";
+import pomas from "./../assets/pomas.png";
+import jm from "./../assets/jm.png";
 
 const circles = [
   {
     radius: 10,
-    fill: "yellow",
-    image: yellow,
+    image: paetan,
     restitution: 0.55,
     points: 2,
+    droppable: true,
   },
   {
     radius: 20,
-    fill: "green",
-    image: green,
+    image: poe,
     restitution: 0.5,
     points: 4,
+    droppable: true,
   },
   {
     radius: 30,
-    fill: "blue",
-    image: blue,
+    image: pophia,
     restitution: 0.45,
     points: 6,
+    droppable: true,
   },
   {
     radius: 40,
-    image: red,
-    fill: "red",
+    image: po,
     restitution: 0.4,
     points: 8,
+    droppable: true,
   },
   {
     radius: 50,
-    image: black,
-    fill: "black",
+    image: palexis,
     restitution: 0.35,
     points: 10,
+    droppable: true,
   },
   {
     radius: 60,
-    image: orange,
-    fill: "orange",
+    image: palec,
     restitution: 0.3,
     points: 12,
+    droppable: false,
+  },
+  {
+    radius: 70,
+    image: pomas,
+    restitution: 0.3,
+    points: 14,
+    droppable: false,
+  },
+  {
+    radius: 80,
+    image: jm,
+    restitution: 0.3,
+    points: 16,
+    droppable: false,
   },
 ];
 
