@@ -3,3 +3,4 @@
 - Manque 4 pastèques
 - Connexion firebase pour les highscore
 - Jouer un son random de minecraft lorsque tu combine une sphere avec une autre
+- Konami code pour faire une explosion de toutes les boules (boum (par rapport à l'explosion (arbre)))
