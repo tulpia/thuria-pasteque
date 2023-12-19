@@ -1,35 +1,45 @@
 // Libraries
-import { collection, getDocs } from "firebase/firestore/lite";
+import {
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  limit,
+} from "firebase/firestore/lite";
 import { useEffect } from "react";
-import { List, ListItem, Typography } from "@mui/material";
+import {
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Typography,
+  Divider,
+} from "@mui/material";
+import StarIcon from "@mui/icons-material/Star";
 
 const Highscore = ({ scores, setScores, db }) => {
   const getScores = async (db) => {
-    const citiesCol = collection(db, "scores");
-    const citySnapshot = await getDocs(citiesCol);
+    const q = query(
+      collection(db, "scores"),
+      orderBy("score", "desc"),
+      limit(10)
+    );
+    const citySnapshot = await getDocs(q);
     const cityList = citySnapshot.docs.map((doc) => doc.data());
 
     return cityList;
   };
 
+  const colors = {
+    0: "#FEE101",
+    1: "#A7A7A7",
+    2: "#A77044",
+  };
+
   useEffect(() => {
     if (db) {
-      // TODO : Récupérer uniquement les plus hauts scores
       getScores(db).then((data) => {
-        const tempData = [];
-        let scoreCount = 0;
-
-        data.forEach((score) => {
-          scoreCount++;
-
-          tempData.push(score.score);
-
-          if (scoreCount > 9) {
-            return;
-          }
-        });
-
-        setScores(tempData.sort((a, b) => a - b).reverse());
+        setScores(data);
       });
     }
   }, [db]);
@@ -39,9 +49,44 @@ const Highscore = ({ scores, setScores, db }) => {
       {scores.length ? (
         <>
           <Typography>Scores</Typography>
-          <List>
-            {scores.map((score) => (
-              <ListItem>{score}</ListItem>
+          <List
+            style={{
+              paddingRight: 20,
+            }}
+          >
+            {scores.map((score, index) => (
+              <>
+                <ListItem
+                  style={{
+                    paddingLeft: 0,
+                    paddingRight: 0,
+                  }}
+                  key={`${score.username}-${score.score}`}
+                >
+                  {index < 3 && (
+                    <ListItemIcon>
+                      <StarIcon
+                        style={{
+                          fill: colors[index],
+                        }}
+                      />
+                    </ListItemIcon>
+                  )}
+
+                  <ListItemText
+                    primary={`${score.username} - ${score.score}`}
+                  />
+                </ListItem>
+
+                {index === 2 && scores.length > 3 && (
+                  <Divider
+                    style={{
+                      marginTop: 15,
+                      marginBottom: 15,
+                    }}
+                  />
+                )}
+              </>
             ))}
           </List>
         </>

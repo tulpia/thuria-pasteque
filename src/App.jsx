@@ -1,11 +1,11 @@
 /* eslint-disable no-unused-vars */
-import "./App.css";
+import "./App.scss";
 
 // Libraries
 import { useEffect, useState, useRef } from "react";
-import { Container, Grid, Typography } from "@mui/material";
+import { Container, Grid } from "@mui/material";
 import { initializeApp } from "firebase/app";
-import { getFirestore, addDoc, collection } from "firebase/firestore/lite";
+import { getFirestore } from "firebase/firestore/lite";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
@@ -19,14 +19,15 @@ import Highscore from "./components/Highscore";
 // Utils
 import circles from "./utils/circles";
 import SuikaEngine from "./classes/SuikaEngine";
+import Lost from "./components/Lost";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCjy8nLbwd2_T4fNYK0Z9if5mYjBbN9LCY",
-  authDomain: "thuria-pasteque.firebaseapp.com",
-  projectId: "thuria-pasteque",
-  storageBucket: "thuria-pasteque.appspot.com",
-  messagingSenderId: "776143272485",
-  appId: "1:776143272485:web:0cdeb446542b46cb345dcc",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
 function App() {
@@ -47,6 +48,7 @@ function App() {
   };
 
   const getMousePos = (canvas, evt) => {
+    setHasLost(true);
     const rect = canvas.getBoundingClientRect();
 
     return {
@@ -56,10 +58,12 @@ function App() {
   };
 
   const handleAddCircle = (e) => {
-    const mousePos = getMousePos(canvasRef.current, e);
+    if (!hasLost) {
+      const mousePos = getMousePos(canvasRef.current, e);
 
-    suikaEngine.current.createCircle(mousePos.x, 0, nextCircle, true);
-    setNextCircle(suikaEngine.current.nextCircle);
+      suikaEngine.current.createCircle(mousePos.x, 0, nextCircle, true);
+      setNextCircle(suikaEngine.current.nextCircle);
+    }
   };
 
   useEffect(() => {
@@ -79,27 +83,11 @@ function App() {
       };
 
       const app = initializeApp(firebaseConfig);
-      const firebaseDb = getFirestore(app);   
-      
+      const firebaseDb = getFirestore(app);
+
       setDb(firebaseDb);
     }
   }, [boxRef, canvasRef, suikaEngine]);
-
-  useEffect(() => {
-    if (hasLost) {
-      const addPoints = async () => {
-        try {
-          await addDoc(collection(db, "scores"), { // passing doc here
-            score: points
-          });
-        }
-        catch (e) {
-          console.log(e.message);
-        }
-      };
-      addPoints();
-    }
-  }, [hasLost]);
 
   return (
     <Container maxWidth={"100%"}>
@@ -126,21 +114,11 @@ function App() {
             style={{
               width: config.width,
               height: config.height,
-              pointerEvents: hasLost ? "none" : "auto",
               position: "relative",
             }}
             onClick={handleAddCircle}
           >
-            {hasLost && (
-              <div className="lost">
-                <Typography color={"white"} fontSize={28} textAlign={"center"}>
-                  YOU LOST
-                </Typography>
-                <Typography color={"white"} fontSize={14} textAlign={"center"}>
-                  Points : <strong>{points}</strong>
-                </Typography>
-              </div>
-            )}
+            {hasLost && <Lost db={db} points={points} />}
             <canvas ref={canvasRef} />
           </div>
         </Grid>
