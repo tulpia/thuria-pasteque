@@ -48,7 +48,6 @@ function App() {
   };
 
   const getMousePos = (canvas, evt) => {
-    setHasLost(true);
     const rect = canvas.getBoundingClientRect();
 
     return {
