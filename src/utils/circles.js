@@ -6,6 +6,9 @@ import palexis from "./../assets/palexis.png";
 import palec from "./../assets/palec.png";
 import pomas from "./../assets/pomas.png";
 import jm from "./../assets/jm.png";
+import manu from "./../assets/manu.png";
+import clem from "./../assets/clem.png";
+import vincent from "./../assets/2000.png";
 
 const circles = [
   {
@@ -60,8 +63,29 @@ const circles = [
   {
     radius: 80,
     image: jm,
-    restitution: 0.3,
+    restitution: 0.25,
     points: 16,
+    droppable: false,
+  },
+  {
+    radius: 80,
+    image: manu,
+    restitution: 0.25,
+    points: 18,
+    droppable: false,
+  },
+  {
+    radius: 80,
+    image: clem,
+    restitution: 0.2,
+    points: 20,
+    droppable: false,
+  },
+  {
+    radius: 80,
+    image: vincent,
+    restitution: 0.15,
+    points: 22,
     droppable: false,
   },
 ];
