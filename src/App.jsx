@@ -1,103 +1,56 @@
 /* eslint-disable no-unused-vars */
-import Matter from "matter-js";
-import { MatterCollisionEvents } from "matter-collision-events";
+
+// Libraries
 import { useEffect, useState, useRef } from "react";
-import "./App.css";
+import { Container, Grid } from "@mui/material";
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore/lite";
 
 // Components
-import NextCircle from "./components/NextCircle";
+import Header from "./components/Header";
+import PointsResume from "./components/PointsResume";
+import Highscore from "./components/Highscore";
 
 // Utils
 import circles from "./utils/circles";
+import SuikaEngine from "./classes/SuikaEngine";
+import Lost from "./components/Lost";
 
-// Ressources
-import yellow from './assets/yellow.png';
-import green from './assets/green.png';
-import blue from './assets/blue.png';
-import red from './assets/red.png';
-import black from './assets/black.png';
-import orange from './assets/orange.png';
+// Assets
+import "./App.scss";
+import "@fontsource/inter/200.css";
+import "@fontsource/inter/300.css";
+import "@fontsource/inter/400.css";
+import "@fontsource/inter/400.css";
+import "@fontsource/inter/500.css";
+import "@fontsource/inter/700.css";
+import logo from "./assets/thuria.png";
 
-Matter.use(MatterCollisionEvents);
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+};
 
 function App() {
+  const [db, setDb] = useState(null);
+  const [scores, setScores] = useState([]);
+  const [nextCircle, setNextCircle] = useState(circles[0]);
+  const [lastCircle, setLastCircle] = useState(null);
+  const [hasLost, setHasLost] = useState(false);
+  const [points, setPoints] = useState(0);
+
+  let suikaEngine = useRef(null);
+  const boxRef = useRef(null);
+  const canvasRef = useRef(null);
+
   const config = {
     width: 500,
     height: 600,
   };
-  const [engine, setEngine] = useState();
-  const floor = useRef(null);
-  const wallLeft = useRef(null);
-  const wallRight = useRef(null);
-  const [nextCircle, setNextCircle] = useState(circles[0]);
-  const boxRef = useRef(null);
-  const canvasRef = useRef(null);
-
-  const handleAddCircle = (e) => {
-    const mousePos = getMousePos(canvasRef.current, e);
-    
-    createCircle(mousePos.x, 0, nextCircle, true);
-  };
-
-  const createCircle = (x, y, selectedCircle, isCreation = false) => {
-    const ball = Matter.Bodies.circle(x, y, selectedCircle.radius, {
-      restitution: selectedCircle.restitution,
-
-      render: {
-        sprite: {
-          texture: eval(selectedCircle.fill)
-        }
-      },
-    });
-
-    Matter.World.add(engine.world, [ball]);
-
-    // On figure out quel est l'élément àjouter après que cet élément soit fusionné
-    let circleIndex = null;
-
-    circles.forEach((circle, index) => {
-      if (circleIndex === null && circle.radius === ball.circleRadius) {
-        circleIndex = index + 1;
-
-        if (circleIndex > circles.length - 1) {
-          circleIndex = null
-        }
-      }
-    });
-
-    // Ajout de l'event sur l'objet
-    if (circleIndex !== null) {
-      ball.onCollide(pair => {
-        if (pair.bodyA.id !== floor.current.id) {
-          let ballCollided = null;
-  
-          if (pair.bodyA.id !== ball.id) {
-            ballCollided = pair.bodyA;
-          }
-  
-          if (pair.bodyB.id !== ball.id) {
-            ballCollided = pair.bodyB;
-          }
-  
-          if (ballCollided) {
-            if (ballCollided.circleRadius === ball.circleRadius && ballCollided.position.y > ball.position.y) {
-              Matter.World.remove(engine.world, ball);
-              Matter.World.remove(engine.world, ballCollided);
-  
-              createCircle(ball.position.x, ball.position.y, circles[circleIndex], false);
-            }
-          }
-        }
-      });
-    }
-
-    // Changement du prochain cercle
-    if (isCreation) {
-      const randomInteger =
-        Math.floor(Math.random() * (circles.length - 2 - 0 + 1)) + 0;
-      setNextCircle(circles[randomInteger]);
-    }
-  }
 
   const getMousePos = (canvas, evt) => {
     const rect = canvas.getBoundingClientRect();
@@ -108,81 +61,90 @@ function App() {
     };
   };
 
+  const handleAddCircle = (e) => {
+    if (!hasLost) {
+      const mousePos = getMousePos(canvasRef.current, e);
+
+      suikaEngine.current.createCircle(mousePos.x, 0, nextCircle, true);
+      setNextCircle(suikaEngine.current.nextCircle);
+    }
+  };
+
   useEffect(() => {
-    let engine = Matter.Engine.create({});
-    let render = Matter.Render.create({
-      element: boxRef.current,
-      engine: engine,
-      canvas: canvasRef.current,
-      options: {
-        width: config.width,
-        height: config.height,
-        background: "rgba(0, 0, 0, 0.3)",
-        wireframes: false,
-      },
-    });
+    if (boxRef.current && canvasRef.current && !suikaEngine.current) {
+      suikaEngine.current = new SuikaEngine(
+        boxRef.current,
+        canvasRef.current,
+        config
+      );
 
-    setEngine(engine);
+      suikaEngine.current.onLastCreatedCircle = (lastCreatedCircle) => {
+        setLastCircle(lastCreatedCircle);
+      };
 
-    floor.current = Matter.Bodies.rectangle(
-      config.width / 2,
-      config.height,
-      config.width,
-      20,
-      {
-        isStatic: true,
-        render: {
-          fillStyle: "blue",
-        },
-      }
-    );
-    
-    wallLeft.current = Matter.Bodies.rectangle(
-      0,
-      config.height / 2,
-      20,
-      config.height,
-      {
-        isStatic: true,
-        render: {
-          fillStyle: "blue",
-        },
-      }
-    );
-    wallRight.current = Matter.Bodies.rectangle(
-      config.width,
-      config.height / 2,
-      20,
-      config.height,
-      {
-        isStatic: true,
-        render: {
-          fillStyle: "blue",
-        },
-      }
-    );
+      suikaEngine.current.onLose = () => {
+        setHasLost(true);
+      };
 
-    Matter.World.add(engine.world, [floor.current, wallLeft.current, wallRight.current]);
+      const app = initializeApp(firebaseConfig);
+      const firebaseDb = getFirestore(app);
 
-    Matter.Runner.run(engine);
-    Matter.Render.run(render);
-  }, []);
+      setDb(firebaseDb);
+    }
+  }, [boxRef, canvasRef, suikaEngine]);
 
   return (
-    <>
-      <NextCircle nextCircle={nextCircle} />
+    <Container maxWidth={"100%"}>
+      <Grid container justifyContent={"center"} maxWidth={"100%"}>
+        <Grid item xs={2} style={{ maxWidth: 230 }}>
+          <Highscore scores={scores} setScores={setScores} db={db}></Highscore>
+        </Grid>
+        <Grid
+          item
+          style={{
+            width: config.width,
+            marginRight: 60,
+            marginLeft: 60,
+          }}
+        >
+          <Header
+            lastCircle={lastCircle}
+            nextCircle={nextCircle}
+            points={points}
+            setPoints={setPoints}
+          />
 
-      <div
-        ref={boxRef}
-        style={{
-          width: config.width,
-          height: config.height,
-        }}
-        onClick={handleAddCircle}
-      >
-        <canvas ref={canvasRef} />
-      </div>
-    </>
+          <div
+            ref={boxRef}
+            style={{
+              width: config.width,
+              height: config.height,
+              position: "relative",
+            }}
+            className="canvas-container"
+            onClick={handleAddCircle}
+          >
+            {hasLost && <Lost db={db} points={points} />}
+            <img
+              src={logo}
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                opacity: 0.05,
+                zIndex: 1,
+                pointerEvents: "none",
+              }}
+            />
+            <canvas ref={canvasRef} />
+          </div>
+        </Grid>
+        <Grid item xs={2}>
+          <PointsResume></PointsResume>
+        </Grid>
+      </Grid>
+    </Container>
   );
 }
 

@@ -1,0 +1,48 @@
+.highscore-item {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+
+  > div {
+    flex: 0 0 auto;
+  }
+
+  &__name-container {
+    display: flex;
+    align-items: center;
+
+    .position {
+      text-align: center;
+      position: relative;
+      z-index: 2;
+      margin-right: 15px;
+      background: rgba(#000, 0.2);
+      width: 28px;
+      height: 28px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+
+      i {
+        color: rgba(#fff, 0.5);
+        font-size: 18px;
+        line-height: 18px;
+        font-weight: 200;
+        margin-left: -2px;
+      }
+    }
+
+    .name {
+      color: white;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 18px;
+      line-height: 18px;
+    }
+  }
+
+  .score {
+    font-size: 18px;
+  }
+}
