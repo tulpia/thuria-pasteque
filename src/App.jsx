@@ -1,15 +1,10 @@
 /* eslint-disable no-unused-vars */
-import "./App.scss";
 
 // Libraries
 import { useEffect, useState, useRef } from "react";
 import { Container, Grid } from "@mui/material";
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore/lite";
-import "@fontsource/roboto/300.css";
-import "@fontsource/roboto/400.css";
-import "@fontsource/roboto/500.css";
-import "@fontsource/roboto/700.css";
 
 // Components
 import Header from "./components/Header";
@@ -20,6 +15,16 @@ import Highscore from "./components/Highscore";
 import circles from "./utils/circles";
 import SuikaEngine from "./classes/SuikaEngine";
 import Lost from "./components/Lost";
+
+// Assets
+import "./App.scss";
+import "@fontsource/inter/200.css";
+import "@fontsource/inter/300.css";
+import "@fontsource/inter/400.css";
+import "@fontsource/inter/400.css";
+import "@fontsource/inter/500.css";
+import "@fontsource/inter/700.css";
+import logo from "./assets/thuria.png";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -91,14 +96,15 @@ function App() {
   return (
     <Container maxWidth={"100%"}>
       <Grid container justifyContent={"center"} maxWidth={"100%"}>
-        <Grid item xs={2}>
+        <Grid item xs={2} style={{ maxWidth: 230 }}>
           <Highscore scores={scores} setScores={setScores} db={db}></Highscore>
         </Grid>
         <Grid
           item
           style={{
             width: config.width,
-            marginRight: 40,
+            marginRight: 60,
+            marginLeft: 60,
           }}
         >
           <Header
@@ -115,9 +121,22 @@ function App() {
               height: config.height,
               position: "relative",
             }}
+            className="canvas-container"
             onClick={handleAddCircle}
           >
             {hasLost && <Lost db={db} points={points} />}
+            <img
+              src={logo}
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                opacity: 0.05,
+                zIndex: 1,
+                pointerEvents: "none",
+              }}
+            />
             <canvas ref={canvasRef} />
           </div>
         </Grid>

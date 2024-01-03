@@ -1,3 +1,5 @@
+import "./styles.scss";
+
 // Libraries
 import {
   collection,
@@ -7,15 +9,10 @@ import {
   limit,
 } from "firebase/firestore/lite";
 import { useEffect } from "react";
-import {
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Typography,
-  Divider,
-} from "@mui/material";
-import StarIcon from "@mui/icons-material/Star";
+import { List, Typography, Divider } from "@mui/material";
+
+// Components
+import HighscoreItem from "./HighscoreItem";
 
 const Highscore = ({ scores, setScores, db }) => {
   const getScores = async (db) => {
@@ -30,12 +27,6 @@ const Highscore = ({ scores, setScores, db }) => {
     return cityList;
   };
 
-  const colors = {
-    0: "#FEE101",
-    1: "#A7A7A7",
-    2: "#A77044",
-  };
-
   useEffect(() => {
     if (db) {
       getScores(db).then((data) => {
@@ -48,35 +39,18 @@ const Highscore = ({ scores, setScores, db }) => {
     <>
       {scores.length ? (
         <>
-          <Typography>Scores</Typography>
+          <Typography style={{ fontSize: 18 }}>
+            <strong>Leaderboard</strong>
+          </Typography>
           <List
             style={{
+              paddingTop: 30,
               paddingRight: 20,
             }}
           >
             {scores.map((score, index) => (
-              <>
-                <ListItem
-                  style={{
-                    paddingLeft: 0,
-                    paddingRight: 0,
-                  }}
-                  key={`${score.username}-${score.score}`}
-                >
-                  {index < 3 && (
-                    <ListItemIcon>
-                      <StarIcon
-                        style={{
-                          fill: colors[index],
-                        }}
-                      />
-                    </ListItemIcon>
-                  )}
-
-                  <ListItemText
-                    primary={`${score.username} - ${score.score}`}
-                  />
-                </ListItem>
+              <div key={index}>
+                <HighscoreItem key={index} index={index} score={score} />
 
                 {index === 2 && scores.length > 3 && (
                   <Divider
@@ -86,7 +60,7 @@ const Highscore = ({ scores, setScores, db }) => {
                     }}
                   />
                 )}
-              </>
+              </div>
             ))}
           </List>
         </>

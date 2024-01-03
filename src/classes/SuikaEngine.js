@@ -41,7 +41,7 @@ class SuikaEngine {
       options: {
         width: this.config.width,
         height: this.config.height,
-        background: "rgba(0, 0, 0, 0.3)",
+        background: "transparent",
         wireframes: false,
       },
     });
@@ -56,7 +56,7 @@ class SuikaEngine {
       {
         isStatic: true,
         render: {
-          fillStyle: "blue",
+          fillStyle: "#3E9EC4",
         },
       }
     );
@@ -69,7 +69,7 @@ class SuikaEngine {
       {
         isStatic: true,
         render: {
-          fillStyle: "blue",
+          fillStyle: "#3E9EC4",
         },
       }
     );
@@ -82,7 +82,7 @@ class SuikaEngine {
       {
         isStatic: true,
         render: {
-          fillStyle: "blue",
+          fillStyle: "#3E9EC4",
         },
       }
     );
@@ -154,7 +154,7 @@ class SuikaEngine {
           if (ballCollided) {
             if (
               ballCollided.circleRadius === ball.circleRadius &&
-              ballCollided.position.y > ball.position.y
+              ballCollided.position.y < ball.position.y
             ) {
               Matter.World.remove(this.engine.world, ball);
               Matter.World.remove(this.engine.world, ballCollided);
